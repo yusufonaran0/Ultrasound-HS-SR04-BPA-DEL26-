@@ -94,7 +94,8 @@ The design follows a **hierarchical modular architecture**.
 
 ## Block Diagram
 
-![Block Diagram](https://drive.google.com/file/d/1sXd2ZUvNd_3MqlbyOKLJz7B38QFzU9a_/view?usp=sharing)
+![Block Diagram](<img width="1024" height="768" alt="top_level_schematics" src="https://github.com/user-attachments/assets/d8575f4e-14db-4ec9-b25a-2a998c7bdd09" />
+)
 
 ---
 

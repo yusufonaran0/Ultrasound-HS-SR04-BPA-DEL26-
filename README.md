@@ -2,7 +2,6 @@
 
 This project is developed for the **Digital Electronics** course at **Brno University of Technology** in the academic year **2025/26**.
 
----
 
 ## Project Overview
 

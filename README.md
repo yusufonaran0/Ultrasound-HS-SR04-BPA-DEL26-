@@ -4,9 +4,7 @@ FPGA-based ultrasonic distance meter using HC-SR04 sensor, echo timing with coun
 
 This project is developed for the **Digital Electronics** course at **Brno University of Technology** in the academic year **2025/26**.
 
-## Project Topic
 
-**6. Ultrasound HS-SR04**
 
 The goal of this project is to measure distance using the **HC-SR04 / HS-SR04 ultrasonic sensor** and display the measured value on the **seven-segment display** of the **Nexys A7-50T FPGA board**.
 

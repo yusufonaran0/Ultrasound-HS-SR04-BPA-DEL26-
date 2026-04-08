@@ -1,5 +1,4 @@
-# Ultrasound-HS-SR04-BPA-DEL26-
-FPGA-based ultrasonic distance meter using HC-SR04 sensor, echo timing with counters, and 7-segment display (Verilog, Nexys A7-50T).
+
 # Ultrasound Distance Meter with HS-SR04 on Nexys A7-50T
 
 This project is developed for the **Digital Electronics** course at **Brno University of Technology** in the academic year **2025/26**.

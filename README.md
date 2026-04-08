@@ -1,66 +1,77 @@
-
 # Ultrasound Distance Meter with HS-SR04 on Nexys A7-50T
 
 This project is developed for the **Digital Electronics** course at **Brno University of Technology** in the academic year **2025/26**.
 
+---
 
+## Project Overview
 
-The goal of this project is to measure distance using the **HC-SR04 / HS-SR04 ultrasonic sensor** and display the measured value on the **seven-segment display** of the **Nexys A7-50T FPGA board**.
+The goal of this project is to design and implement a **real-time distance measurement system** using the **HC-SR04 / HS-SR04 ultrasonic sensor** and an **FPGA-based architecture** on the **Nexys A7-50T board**.
 
-The design is implemented in **Verilog** using a **hierarchical structure** and reuses standard course modules such as `counter`, `debounce`, `bin2seg`, and `display_driver`, together with new project-specific modules for ultrasonic triggering, echo measurement, and distance conversion.
+The system performs:
+- Generation of a **10 µs trigger pulse**
+- Measurement of the **echo pulse width**
+- Conversion of measured time into **distance**
+- Display of distance on **7-segment display**
+- Distance-based **buzzer feedback** (parking sensor behavior)
+
+The design is implemented in **Verilog** using a **hierarchical modular structure**, consistent with the course laboratory methodology.
 
 ---
 
 ## Problem Description
 
-The ultrasonic sensor measures distance by transmitting a short ultrasonic pulse and receiving its echo reflected from an object. The FPGA generates a trigger pulse, measures the duration of the echo signal, and converts this measured pulse width into a distance-related value. The result is then shown on the onboard seven-segment display.
+Ultrasonic distance measurement is based on the **time-of-flight principle**:
 
-This project combines:
-- digital timing generation,
+1. A short ultrasonic pulse is transmitted  
+2. The signal reflects from an object  
+3. The echo returns to the sensor  
+4. The elapsed time is proportional to distance  
+
+The FPGA:
+- generates the trigger signal,
+- measures the echo duration,
+- converts the result into a distance value,
+- and drives visual and audio outputs.
+
+This project integrates:
+- digital timing,
 - pulse-width measurement,
-- synchronous sequential design,
-- display driving,
-- modular Verilog design,
-- FPGA implementation on real hardware.
+- synchronous design,
+- modular FPGA architecture,
+- real hardware interfacing.
 
 ---
 
-## Project Objectives
+## System Features
 
-After completing the project, the system should be able to:
-
-- generate a correct trigger pulse for the ultrasonic sensor,
-- detect and measure the width of the echo pulse,
-- calculate or approximate the measured distance,
-- display the measured value on the Nexys A7 seven-segment display,
-- support reset and optional user control using push buttons,
-- operate reliably on the Nexys A7-50T FPGA board.
+- ✔ Automatic continuous measurement  
+- ✔ Push-button control:
+  - **Reset (btnu)**
+  - **Hold (btnd)** (freeze current value)  
+- ✔ Real-time display on 7-segment  
+- ✔ Distance-based buzzer feedback  
+- ✔ LED indicators for system status  
+- ✔ Fully modular Verilog design  
 
 ---
-
-## Roles (Architecture Phase)
-
-- Malekimoghaddam Niloofar  
-  System architecture, top-level design, documentation
-
-- Onaran Yusuf Çetin  
-  Sensor interface, echo capture, simulation and testbench
 
 ## Hardware Platform
 
-- **FPGA board:** Digilent Nexys A7-50T
-- **Sensor:** HC-SR04 / HS-SR04 ultrasonic distance sensor
-- **Display:** Onboard 7-segment display
-- **Inputs:** Push buttons for reset / optional control
-- **Clock:** 100 MHz onboard oscillator
+- **FPGA board:** Digilent Nexys A7-50T  
+- **Sensor:** HC-SR04 / HS-SR04 ultrasonic sensor  
+- **Display:** Onboard 7-segment display  
+- **Inputs:** Push buttons (reset, hold)  
+- **Clock:** 100 MHz onboard oscillator  
+- **Output:** Buzzer  
 
-> Note: External sensor connections must respect FPGA I/O voltage limits. Proper level shifting or safe interfacing is required for the sensor signals. So we will use level shifter for the project. 
+> ⚠️ Note: The ultrasonic sensor uses 5V logic. A **level shifter** must be used for safe FPGA interfacing (3.3V).
 
 ---
 
-## Planned Design Structure
+## System Architecture
 
-The project follows a **hierarchical design** approach.
+The design follows a **hierarchical modular architecture**.
 
 ### Top-level module
 - `ultrasonic_top`
@@ -70,17 +81,68 @@ The project follows a **hierarchical design** approach.
 - `debounce`
 - `bin2seg`
 - `display_driver`
-- `clk_en` (if needed)
+- `clk_en` (if required)
 
-### New project-specific modules
-- `hs_sr04_trigger`
-- `hs_sr04_echo_capture`
-- `distance_converter`
-- `measurement_control` *(optional, depending on final architecture)*
+### Custom modules
+- `measurement_control` → system control (start / hold / reset)
+- `hs_sr04_trigger` → 10 µs trigger generation
+- `sr04_echo_capture` → echo pulse width measurement
+- `distance_converter` → count → distance conversion
+- `buzzer_control` → distance-based audio feedback
 
 ---
 
 ## Block Diagram
 
-The preliminary architecture of the project is:
+![Block Diagram](top_level_schematics.png)
 
+---
+
+## Signal Flow Description
+
+### Control Path
+- `btnd → debounce → measurement_control`
+- `btnu → measurement_control (reset)`
+
+### Measurement Path
+- `measurement_control → hs_sr04_trigger → trig`
+- `echo → sr04_echo_capture`
+- `sr04_echo_capture → distance_converter`
+
+### Output Path
+- `distance_converter → display_driver → seg, an, dp`
+- `distance_converter → buzzer_control → buzzer`
+
+### Status Output
+- `measurement_control → led[3:0]`
+
+---
+
+## Design Methodology
+
+- ✔ Hierarchical design  
+- ✔ Separation of control and data paths  
+- ✔ Synchronous design (clocked logic)  
+- ✔ Reusable modules  
+- ✔ Simulation before integration  
+- ✔ No latches (verified after synthesis)  
+
+---
+
+## Project Plan
+
+- **Lab 1:** Architecture, block diagram, Git setup  
+- **Lab 2:** Module design + testbench  
+- **Lab 3:** Integration + synthesis  
+- **Lab 4:** Debugging + optimization  
+- **Lab 5:** Final demo + defense  
+
+---
+
+## Team Members
+
+- **Malekimoghaddam Niloofar**  
+  System architecture, top-level design, documentation  
+
+- **Onaran Yusuf Çetin**  
+  Sensor interface, echo capture, simulation and verification  

@@ -3,6 +3,7 @@
 This project is developed for the **Digital Electronics** course at **Brno University of Technology** in the academic year **2025/26**.
 
 
+
 ## Project Overview
 
 The goal of this project is to design and implement a **real-time distance measurement system** using the **HC-SR04 / HS-SR04 ultrasonic sensor** and an **FPGA-based architecture** on the **Nexys A7-50T board**.
@@ -16,7 +17,7 @@ The system performs:
 
 The design is implemented in **Verilog** using a **hierarchical modular structure**, consistent with the course laboratory methodology.
 
----
+
 
 ## Problem Description
 
@@ -40,7 +41,7 @@ This project integrates:
 - modular FPGA architecture,
 - real hardware interfacing.
 
----
+
 
 ## System Features
 
@@ -53,7 +54,7 @@ This project integrates:
 - ✔ LED indicators for system status  
 - ✔ Fully modular Verilog design  
 
----
+
 
 ## Hardware Platform
 
@@ -66,7 +67,7 @@ This project integrates:
 
 > ⚠️ Note: The ultrasonic sensor uses 5V logic. A **level shifter** must be used for safe FPGA interfacing (3.3V).
 
----
+
 
 ## System Architecture
 
@@ -89,13 +90,13 @@ The design follows a **hierarchical modular architecture**.
 - `distance_converter` → count → distance conversion
 - `buzzer_control` → distance-based audio feedback
 
----
+
 
 ## Block Diagram
 
 ![Block Diagram](top_level_schematics.png)
 
----
+
 
 ## Signal Flow Description
 
@@ -115,28 +116,7 @@ The design follows a **hierarchical modular architecture**.
 ### Status Output
 - `measurement_control → led[3:0]`
 
----
 
-## Design Methodology
-
-- ✔ Hierarchical design  
-- ✔ Separation of control and data paths  
-- ✔ Synchronous design (clocked logic)  
-- ✔ Reusable modules  
-- ✔ Simulation before integration  
-- ✔ No latches (verified after synthesis)  
-
----
-
-## Project Plan
-
-- **Lab 1:** Architecture, block diagram, Git setup  
-- **Lab 2:** Module design + testbench  
-- **Lab 3:** Integration + synthesis  
-- **Lab 4:** Debugging + optimization  
-- **Lab 5:** Final demo + defense  
-
----
 
 ## Team Members
 

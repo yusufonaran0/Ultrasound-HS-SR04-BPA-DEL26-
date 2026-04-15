@@ -55,6 +55,21 @@ The **output subsystem** includes a multiplexed 7-segment display driver, LED in
 
 ---
 
+## Top-Level I/O Ports
+
+| Port name | Direction | Type | Description |
+| :--- | :---: | :---: | :--- |
+| `clk` | input | `wire` | Main 100 MHz clock |
+| `btnu` | input | `wire` | High-active synchronous reset |
+| `btnd` | input | `wire` | Hold button input |
+| `echo` | input | `wire` | Echo signal from ultrasonic sensor |
+| `trig` | output | `wire` | Trigger pulse output to ultrasonic sensor |
+| `buzzer` | output | `wire` | Distance-dependent buzzer output |
+| `seg[6:0]` | output | `wire [6:0]` | Seven-segment cathodes (active-low) |
+| `an[7:0]` | output | `wire [7:0]` | Seven-segment anodes (active-low) |
+| `dp` | output | `wire` | Decimal point output (active-low, not used) |
+| `led[3:0]` | output | `wire [3:0]` | Status and debug indicators |
+
 
 ## Hardware Platform
 

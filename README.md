@@ -4,7 +4,7 @@ This project is developed for the **Digital Electronics** course at **Brno Unive
 
 The objective of this project is to design and implement a **fully synchronous FPGA-based ultrasonic distance measurement system** using the **HC-SR04 / HS-SR04 sensor** on the **Nexys A7-50T board**, following a **modular and hierarchical Verilog design methodology**.
 
-The system performs real-time distance measurement by generating a trigger signal, capturing the returning echo pulse, and converting the measured time interval into a distance value, which is displayed on the onboard **multiplexed 7-segment display**.
+The system performs real-time distance measurement by generating a trigger signal, capturing the returning echo pulse, and converting the measured time interval into a distance value, which is displayed on the onboard **multiplexed 7-segment display**. Additional outputs such as LEDs and a buzzer provide user feedback and system status indication.
 
 ---
 
@@ -12,154 +12,91 @@ The system performs real-time distance measurement by generating a trigger signa
 
 The ultrasonic sensor operates based on the **time-of-flight (ToF)** principle.
 
-1. A **10 µs trigger pulse** is applied to the sensor.
-2. The sensor emits an ultrasonic burst (≈40 kHz).
-3. The signal is reflected from an object and received back.
-4. The sensor outputs a digital **echo signal**, whose pulse width is proportional to the travel time of the wave.
+A short trigger pulse is applied to the sensor, which emits an ultrasonic wave (approximately 40 kHz). This wave reflects from an object and returns to the sensor. The sensor then outputs a digital **echo signal**, whose pulse width is proportional to the total travel time of the wave.
 
-The measured time \( t \) is related to distance \( d \) by:
+The measured time (t) is related to distance (d) by:
 
-\[
-d = \frac{v_{sound} \cdot t}{2}
-\]
+d = (v_sound × t) / 2
 
 where:
-- \( v_{sound} \approx 343 \, \text{m/s} \)
-- division by 2 accounts for the round trip
+- v_sound ≈ 343 m/s (speed of sound in air)
+- division by 2 accounts for the forward and return path of the ultrasonic wave
 
-In this implementation, the FPGA measures the **echo pulse width in clock cycles**, and the result is scaled to produce a distance representation suitable for display.
-
----
-
-## System Architecture
-
-The design follows a **hierarchical RTL architecture**, where each subsystem is implemented as an independent module and integrated in the top-level entity `ultrasonic_top`.
-
-The architecture is divided into three main subsystems:
-
-### 1. Control Subsystem
-
-The control logic is responsible for:
-- system initialization,
-- measurement triggering,
-- user interaction handling,
-- synchronization of data flow between modules.
-
-Push buttons are processed using a **debounce module**, eliminating metastability and mechanical bouncing effects. The processed signals are used to generate control signals such as:
-- `start_meas`
-- `hold_en`
-- `reset`
-
-The control unit ensures that:
-- measurements are periodically triggered,
-- results are latched during hold mode,
-- invalid states are avoided.
+In this implementation, the FPGA measures the echo pulse width in clock cycles and converts it into a distance-related value suitable for display.
 
 ---
 
-### 2. Measurement Subsystem
+## System Description
 
-This subsystem interfaces directly with the ultrasonic sensor and performs precise timing measurement.
+The system is implemented as a **fully synchronous digital design** using a single 100 MHz clock. All modules operate on clock edges, ensuring predictable and stable behavior.
 
-#### Trigger Generator (`hs_sr04_trigger`)
-- Generates a **10 µs pulse** using a counter-based timing mechanism.
-- Operates synchronously with the system clock (100 MHz).
-- Ensures correct sensor activation timing.
+After power-up, the system automatically starts periodic distance measurements. The user can interact with the system using push buttons: one for reset and one for hold functionality. When hold mode is active, the measured distance is frozen and displayed continuously.
 
-#### Echo Capture (`hs_sr04_echo_capture`)
-- Detects rising and falling edges of the echo signal.
-- Measures pulse width using a **high-resolution counter**.
-- Includes timeout protection to avoid system blocking when no echo is received.
-
-The measured value is represented as:
-\[
-\text{echo\_count} = \frac{t_{echo}}{T_{clk}}
-\]
-
-where \( T_{clk} = 10 \, \text{ns} \) (100 MHz clock).
+The measured distance is shown on the **7-segment display**, while LEDs indicate system states such as active measurement and hold mode. In addition, a **buzzer output** provides acoustic feedback, where the beeping rate increases as the measured distance decreases, similar to automotive parking sensors.
 
 ---
 
-### 3. Data Processing and Output Subsystem
+## Architecture Overview
 
-#### Distance Converter (`distance_converter`)
-- Converts raw counter values into scaled distance units.
-- Uses integer arithmetic to approximate physical distance without floating-point operations.
-- Designed to balance accuracy and FPGA resource usage.
+The design follows a **hierarchical structure**, where the top-level module `ultrasonic_top` integrates several functional blocks.
 
-#### Display Driver (`display_driver + bin2seg`)
-- Implements **time-multiplexed control** of the 8-digit 7-segment display.
-- Converts binary values into segment patterns.
-- Ensures flicker-free visualization using a clock enable module.
+The **control logic** manages system behavior, including measurement triggering, hold mode, and synchronization between modules. Push button inputs are processed using a debounce module to eliminate mechanical noise and ensure stable signals.
 
-#### Buzzer Control (`buzzer_control`)
-- Generates an audible signal whose frequency or repetition rate depends on measured distance.
-- Implements a **proximity-based alert mechanism**, similar to automotive parking sensors.
-- Closer objects produce higher frequency beeping.
+The **measurement subsystem** interfaces directly with the ultrasonic sensor. A trigger module generates a precise 10 µs pulse, and an echo capture module measures the width of the returning signal using a high-resolution counter. Timeout handling is included to prevent system lock-up when no echo is received.
 
-#### LED Indicators
-- Provide real-time system status:
-  - measurement active
-  - hold mode active
-  - echo detected
-  - error/timeout indication
+The **data processing stage** converts the measured counter value into a scaled distance representation using integer arithmetic. This avoids floating-point operations and ensures efficient FPGA resource usage.
+
+The **output subsystem** includes a multiplexed 7-segment display driver, LED indicators, and a buzzer control module. The display driver ensures flicker-free visualization using time-multiplexing, while the buzzer provides distance-dependent acoustic feedback.
+
+---
+## Block Diagram
+
+![Block Diagram](top_level_schematics.png)
 
 ---
 
-## Timing and Synchronization
 
-All modules operate under a **single global clock (100 MHz)**, ensuring synchronous behavior.
+## Hardware Platform
 
-Key design considerations:
-- no combinational feedback loops,
-- no unintended latch inference,
-- all state changes occur on clock edges,
-- proper reset handling across all modules.
+The system is implemented on the **Digilent Nexys A7-50T FPGA board**, using the onboard 100 MHz clock source.
 
-Clock enable signals (`clk_en`) are used to derive slower timing domains without introducing multiple clocks.
+The ultrasonic sensor (HC-SR04 / HS-SR04) requires a 5V supply, while FPGA I/O operates at 3.3V. Therefore, proper **level shifting** is required, especially for the echo signal, to ensure safe operation and avoid damage to the FPGA.
 
----
-
-## Hardware Considerations
-
-- The FPGA operates at **3.3V logic**, while the ultrasonic sensor requires **5V supply**.
-- The echo signal must be safely interfaced using a **level shifter or voltage divider**.
-- Trigger signal from FPGA is compatible with sensor input logic.
-
-Incorrect voltage interfacing may damage the FPGA and must be handled carefully.
+The system uses:
+- push buttons for user input (reset, hold),
+- onboard LEDs for status indication,
+- 7-segment display for distance visualization,
+- an external buzzer for acoustic feedback.
 
 ---
 
-## Implementation Methodology
+## Implementation Notes
 
-The project strictly follows a structured FPGA development flow:
+The project is implemented in **Verilog HDL** using **Vivado 2025.2**. The design strictly follows FPGA development best practices, including:
 
-1. RTL design using Verilog
-2. Functional simulation (testbenches for each module)
-3. RTL schematic verification
-4. Synthesis and resource analysis
-5. Timing verification
-6. Bitstream generation
-7. Hardware testing on Nexys A7
+- hierarchical module structure
+- synchronous design principles
+- avoidance of unintended latch inference
+- simulation before hardware implementation
+- clean and readable coding style
 
-Simulation is prioritized to validate:
-- timing correctness,
-- edge detection,
-- counter behavior,
-- system stability.
+Clock enable signals are used to generate slower timing events without introducing multiple clock domains. All critical signals are synchronized to the main system clock.
+
+Special care is taken in edge detection and timing measurement to ensure reliable operation of the echo capture mechanism.
 
 ---
 
-## Design Challenges
+## Weekly Progress
 
-Key challenges addressed in this project include:
+### Week 1 – Architecture and Planning
 
-- Accurate pulse-width measurement at high clock frequency
-- Reliable edge detection under asynchronous input conditions
-- Avoiding metastability and glitches
-- Designing efficient integer-based distance conversion
-- Ensuring flicker-free multi-digit display
-- Synchronizing multiple interacting modules
+During the first week, the foundation of the project was established.
+
+The system requirements were analyzed, and all major design decisions were made. The functionality of the system was clearly defined, including automatic measurement operation, hold mode behavior, LED indicators, and buzzer feedback.
+
+A complete **block diagram** of the system was designed, defining all modules and their interconnections. The internal data flow, control signals, and module responsibilities were carefully planned to ensure a clean and modular architecture.
+
+The Git repository was initialized, and the initial project documentation was created. The structure of the project, including planned modules and development steps, was defined in advance to support systematic implementation in the following weeks.
 
 ---
 
@@ -170,23 +107,8 @@ Key challenges addressed in this project include:
 
 ---
 
-## Conclusion
-
-This project demonstrates a complete **real-time embedded measurement system implemented on FPGA**, integrating:
-
-- precise digital timing,
-- sensor interfacing,
-- synchronous system design,
-- modular hardware architecture,
-- and user interaction mechanisms.
-
-The final system is robust, scalable, and fully compliant with FPGA design best practices, providing both functional correctness and engineering-level implementation quality.
 
 
-
-## Block Diagram
-
-![Block Diagram](top_level_schematics.png)
 
 
 

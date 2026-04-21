@@ -51,7 +51,7 @@ The **output subsystem** includes a multiplexed 7-segment display driver, LED in
 ---
 ## Block Diagram
 
-![Block Diagram](top_level_schematics.png)
+![Block Diagram](top_level._ver2_schematics.png)
 
 ---
 

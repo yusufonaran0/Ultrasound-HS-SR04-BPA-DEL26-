@@ -115,14 +115,35 @@ Signal behavior:
 
 Since Vivado was not always available on the personal machine, an **online EDA simulator** was used during development.
 
-EDA simulation testbenches can be accessed in:
+EDA simulation testbenches can be accessed below. Each module includes a direct link to its testbench code and corresponding waveform output:
 
-eda_simulation_tb_codes/
+- Display Driver  
+  Testbench: [display_driver_tb.v](eda_simulation_tb_codes/display_driver_tb.v)  
+  Waveform: [display_driver_eda_waveforms.png](images/display_driver_eda_waveforms.png)
 
-All modules were tested individually.
+- Distance Converter  
+  Testbench: [distance_converter_tb.v](eda_simulation_tb_codes/distance_converter_tb.v)  
+  Waveform: [distance_converter_eda_waveforms.png](images/distance_converter_eda_waveforms.png)
 
-Afterwards, all modules were re-simulated using Vivado, and finally the complete system was verified.
+- HS-SR04 Trigger  
+  Testbench: [hs_sr04_trigger_tb.v](eda_simulation_tb_codes/hs_sr04_trigger_tb.v)  
+  Waveform: [hs_sr04_trigger_eda_waveforms.png](images/hs_sr04_trigger_eda_waveforms.png)
 
+- Measurement Control (FSM)  
+  Testbench: [measurement_control_tb.v](eda_simulation_tb_codes/measurement_control_tb.v)  
+  Waveform: [measurement_control_eda_waveforms.png](images/measurement_control_eda_waveforms.png)
+
+- Echo Capture  
+  Testbench: [sr04_echo_capture_tb.v](eda_simulation_tb_codes/sr04_echo_capture_tb.v)  
+  Waveform: [sr04_echo_capture_eda_waveforms.png](images/sr04_echo_capture_eda_waveforms.png)
+
+- Buzzer Control  
+  Testbench: [buzzer_control_tb.v](eda_simulation_tb_codes/buzzer_control_tb.v)  
+  Waveform: [buzzer_control_eda_waveforms.png](images/buzzer_control_eda_waveforms.png)
+
+- Top-Level Integration  
+  Testbench: [ultrasonic_top_tb.v](eda_simulation_tb_codes/ultrasonic_top_tb.v)  
+  Waveform: [top_level_eda_waveforms.png](images/top_level_eda_waveforms.png)
 ### Top-Level Simulation (Vivado)
 
 ![Top-Level Simulation](images/top_level_vivado_waveforms.jpeg)

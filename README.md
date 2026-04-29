@@ -209,7 +209,7 @@ Bitstream was successfully generated and uploaded.
 
 Due to time constraints, full hardware testing with connected components was not completed.
 
-![FPGA](images/week_3_physical.jpeg)
+![FPGA](images/pyhsical_implemented_circuit.jpeg)
 
 ---
 

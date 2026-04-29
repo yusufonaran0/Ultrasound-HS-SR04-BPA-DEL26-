@@ -9,7 +9,7 @@ module debounce (
 );
 
     localparam integer SHIFT_LEN = 4;
-    localparam integer MAX       = 2;   // simulation value
+    localparam integer MAX       = 200_000;   // simulation value wsa 2 
 
     wire ce_sample;
     reg  sync0, sync1;

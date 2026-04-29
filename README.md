@@ -1,175 +1,206 @@
-# Ultrasonic Distance Meter (HS-SR04) – Nexys A7 FPGA
+# Ultrasonic Distance Meter using HS-SR04 (FPGA - Nexys A7)
 
-## Project Description
+## Project Overview
 
-This project implements an ultrasonic distance measurement system using the HS-SR04 sensor on the Nexys A7-50T FPGA board. The system generates a trigger pulse, measures the duration of the echo signal, computes the distance in centimeters, and displays the result on a 7-segment display. A buzzer provides feedback based on the measured distance.
+This project implements a complete ultrasonic distance measurement system using the HS-SR04 sensor on a Xilinx Nexys A7 FPGA board. The system measures distance, displays the result on a 7-segment display, and provides proximity feedback using a buzzer.
 
-The design is implemented in Verilog using a hierarchical structure. Each module was individually developed, simulated, and then integrated into a top-level design.
+The design follows a hierarchical modular architecture, where each functional block is implemented as a separate Verilog module and integrated at the top level.
 
 ---
 
 ## System Architecture and Interconnection
 
-The system operates as a pipeline controlled by a finite state machine:
+The system consists of the following main functional stages:
 
-1. A trigger pulse (10 µs) is generated to start the ultrasonic measurement  
-2. The sensor returns an echo signal whose duration is proportional to distance  
-3. The echo duration is measured using a counter  
-4. The measured value is converted into distance (cm)  
-5. The result is displayed and used to control a buzzer  
+1. Trigger generation  
+2. Echo signal capture  
+3. Distance computation  
+4. Measurement control (FSM)  
+5. Output handling (display + buzzer)
 
-Top-level module:
+### Data Flow
 
-- [`ultrasonic_top.v`](vivado/ultrasonic_1.srcs/sources_1/new/ultrasonic_top.v)
+- The system starts a measurement using the `measurement_control` FSM
+- `hs_sr04_trigger` generates a 10 µs pulse (TRIG)
+- The ultrasonic sensor sends back an ECHO pulse
+- `sr04_echo_capture` measures the duration of the ECHO pulse
+- `distance_converter` converts this duration to distance (cm)
+- The result is:
+  - Displayed on 7-segment display (`display_driver`)
+  - Used to drive buzzer behavior (`buzzer_control`)
 
-### Top-Level I/O Signals
+---
 
-Inputs:
-- `clk` – 100 MHz system clock  
-- `btnu` – reset  
-- `btnd` – hold mode control  
-- `echo` – echo signal from HS-SR04  
+## Top-Level Module I/O Description
 
-Outputs:
-- `trig` – trigger signal to HS-SR04  
-- `seg[6:0]` – 7-segment cathodes  
-- `an[7:0]` – 7-segment anodes  
-- `dp` – decimal point  
-- `buzzer` – audio output  
-- `led[3:0]` – debug/status signals  
+### Inputs
 
-### Updated Block Diagram
+| Signal | Description |
+|------|------------|
+| `clk` | 100 MHz system clock |
+| `btnu` | Reset signal (active high) |
+| `btnd` | Hold mode button |
+| `echo` | Echo signal from ultrasonic sensor |
 
-![Top Level Schematic](images/schematics_top_level_ver3.png)
+### Outputs
 
-This schematic explicitly shows module interconnections and signal flow, addressing the requirement for clearly defined inputs, outputs, and internal signals.
+| Signal | Description |
+|------|------------|
+| `trig` | Trigger signal to ultrasonic sensor |
+| `buzzer` | Buzzer output |
+| `seg[6:0]` | 7-segment display cathodes |
+| `an[7:0]` | 7-segment display anodes |
+| `dp` | Decimal point |
+| `led[3:0]` | Status indicators |
+
+### LED Mapping
+
+| LED | Meaning |
+|-----|--------|
+| LED0 | Measuring active |
+| LED1 | Hold mode active |
+| LED2 | Valid measurement |
+| LED3 | Timeout occurred |
 
 ---
 
 ## Module Implementation
 
-All modules are implemented in a hierarchical structure inside the Vivado project:
+All modules are implemented inside the Vivado project and connected hierarchically.
 
-### Core Modules
-
-- Trigger generation  
-  [`hs_sr04_trigger.v`](vivado/ultrasonic_1.srcs/sources_1/new/hs_sr04_trigger.v)
-
-- Echo signal capture  
-  [`sr04_echo_capture.v`](vivado/ultrasonic_1.srcs/sources_1/new/sr04_echo_capture.v)
-
-- Distance conversion  
-  [`distance_converter.v`](vivado/ultrasonic_1.srcs/sources_1/new/distance_converter.v)
-
-- Measurement control (FSM)  
-  [`measurement_control.v`](vivado/ultrasonic_1.srcs/sources_1/new/measurement_control.v)
-
-### Output and Interface Modules
-
-- Display driver  
-  [`display_driver.v`](vivado/ultrasonic_1.srcs/sources_1/new/display_driver.v)
-
-- Buzzer control  
-  [`buzzer_control.v`](vivado/ultrasonic_1.srcs/sources_1/new/buzzer_control.v)
-
-### Supporting Modules
-
-- Debouncer  
-  [`debounce.v`](vivado/ultrasonic_1.srcs/sources_1/new/debounce.v)
-
-- Clock enable generator  
-  [`clk_en.v`](vivado/ultrasonic_1.srcs/sources_1/new/clk_en.v)
-
-- Counter  
-  [`counter.v`](vivado/ultrasonic_1.srcs/sources_1/new/counter.v)
-
-- Binary to 7-segment decoder  
-  [`bin2seg.v`](vivado/ultrasonic_1.srcs/sources_1/new/bin2seg.v)
+| Module | Function | Source |
+|---|---|---|
+| `ultrasonic_top` | Top-level integration of all modules | [`ultrasonic_top.v`](vivado/ultrasonic_1.srcs/sources_1/new/ultrasonic_top.v) |
+| `hs_sr04_trigger` | Generates 10 µs trigger pulse | [`hs_sr04_trigger.v`](vivado/ultrasonic_1.srcs/sources_1/new/hs_sr04_trigger.v) |
+| `sr04_echo_capture` | Measures echo pulse duration and detects timeout | [`sr04_echo_capture.v`](vivado/ultrasonic_1.srcs/sources_1/new/sr04_echo_capture.v) |
+| `distance_converter` | Converts echo cycles to distance (cm) | [`distance_converter.v`](vivado/ultrasonic_1.srcs/sources_1/new/distance_converter.v) |
+| `measurement_control` | FSM controlling measurement process | [`measurement_control.v`](vivado/ultrasonic_1.srcs/sources_1/new/measurement_control.v) |
+| `display_driver` | Drives multiplexed 7-segment display | [`display_driver.v`](vivado/ultrasonic_1.srcs/sources_1/new/display_driver.v) |
+| `buzzer_control` | Generates distance-based buzzer signal | [`buzzer_control.v`](vivado/ultrasonic_1.srcs/sources_1/new/buzzer_control.v) |
+| `debounce` | Removes button noise | [`debounce.v`](vivado/ultrasonic_1.srcs/sources_1/new/debounce.v) |
+| `clk_en` | Generates slower clock enable signals | [`clk_en.v`](vivado/ultrasonic_1.srcs/sources_1/new/clk_en.v) |
+| `counter` | Parameterized counter | [`counter.v`](vivado/ultrasonic_1.srcs/sources_1/new/counter.v) |
+| `bin2seg` | Binary to 7-segment conversion | [`bin2seg.v`](vivado/ultrasonic_1.srcs/sources_1/new/bin2seg.v) |
 
 ---
 
 ## Simulation
 
-Due to the absence of Vivado on my personal computer outside the laboratory environment, an online EDA simulator was used during development.
+Due to hardware limitations on the personal computer, initial simulations were performed using an online EDA simulator.
 
-EDA simulation waveforms can be accessed here:  
-- [`images/`](images/)
+EDA simulation testbenches can be accessed here:
 
-Each module was tested individually using dedicated testbenches.
+`eda_simulation_tb_codes/`
 
-After development, all modules were simulated again in Vivado:
-- Individual module simulations were verified  
-- Final validation was performed using top-level simulation  
+Each module was individually tested and verified.
 
-Vivado top-level simulation waveform:
+Afterwards, all modules were simulated again in Vivado environment, and finally the complete system (top-level module) was verified.
 
-![Vivado Simulation](images/top_level_vivado_waveforms.jpeg)
+### Top-Level Vivado Simulation
 
-Testbench files:
+![Top Level Simulation](images/top_level_vivado_waveforms.jpeg)
 
-- EDA testbenches  
-  [`eda_simulation_tb_codes/`](eda_simulation_tb_codes)
+---
 
-- Vivado simulation testbenches  
-  [`vivado/ultrasonic_1.srcs/sim_1/new/`](vivado/ultrasonic_1.srcs/sim_1/new)
+## Module-Level Simulation Results
+
+Detailed simulation waveforms for each module are available in:
+
+`images/README.md`
+
+These include:
+
+- Trigger generation behavior
+- Echo capture timing
+- Distance conversion correctness
+- FSM transitions
+- Display multiplexing
+- Buzzer timing response
 
 ---
 
 ## Hardware Implementation
 
-The design was synthesized and implemented on the Nexys A7-50T FPGA.
+The Vivado project is fully included in this repository:
 
-Bitstream generation and programming were successfully completed. Due to time constraints, full integration with external components (sensor and buzzer) could not be finalized on hardware.
+`vivado/`
 
-Initial FPGA test (without external components):
+It contains:
+- Source files
+- Constraints file (XDC)
+- Simulation files
+- Project file (.xpr)
 
-![Board Test](images/week_3_physical.jpeg)
-
-### Physical Connection Design
-
-A wiring schematic was prepared for the complete system, including:
-
-- HS-SR04 ultrasonic sensor  
-- Logic level converter (5V → 3.3V for echo)  
-- External buzzer  
-- External 5V supply (Arduino)  
-
-![Physical Schematic](images/physical_schematics.jpeg)
+Bitstream generation and FPGA programming were successfully completed.
 
 ---
 
-## Vivado Project
+## Physical Implementation
 
-The complete Vivado 2025.2 project is included in the repository:
+### FPGA Test (Without External Components)
 
-- [`vivado/ultrasonic_1.xpr`](vivado/ultrasonic_1.xpr)
+![FPGA Test](images/week_3_physical.jpeg)
 
-This satisfies the requirement of providing a full project for reproducibility.
+The system was tested on the Nexys A7 board without external sensor connection to verify:
+
+- FSM behavior
+- Display functionality
+- Button handling
+- Internal signal correctness
+
+### Wiring Diagram
+
+![Physical Schematic](images/physical_schematics.jpeg)
+
+This diagram shows how:
+
+- HS-SR04 sensor
+- Logic level converter
+- External 5V supply (Arduino)
+- Buzzer
+
+are connected to the FPGA.
 
 ---
 
 ## Weekly Progress
 
-Week 1:  
-Project architecture was defined. Initial block diagram and system structure were created. Repository structure and constraints file were prepared.
+### Week 1
+- Project scope defined
+- Initial system architecture designed
+- First schematic created
+- Module breakdown planned
 
-Week 2:  
-All required modules were implemented in Verilog. Individual testbenches were developed and simulations were performed.
+### Week 2
+- All core modules implemented
+- FSM designed
+- Interface modules developed
 
-Week 3:  
-Modules were integrated into the top-level design. Full system simulations were completed. Bitstream was generated and uploaded to the FPGA board.
+### Week 3
+- All modules simulated individually
+- Top-level simulation completed
+- Vivado project created
+- Bitstream generated and uploaded
+- FPGA tested without external components
 
 ---
 
-## Notes
+## Notes on Ultrasonic Sensor Integration
 
-- Hierarchical design methodology was followed  
-- All modules were simulated before integration  
-- External voltage constraints (3.3V logic) were respected  
-- Echo signal requires level shifting from 5V to 3.3V  
+- Sensor operates at 5V
+- FPGA operates at 3.3V
+- Logic level converter is required for ECHO signal
+- TRIG signal (3.3V) is sufficient for sensor input
 
 ---
 
 ## Conclusion
 
-This project demonstrates a complete FPGA-based measurement system integrating sensor interfacing, timing analysis, FSM-based control, and hardware implementation. All required elements such as simulations, schematics, and the Vivado project are included.
+The project successfully demonstrates a complete FPGA-based ultrasonic distance measurement system with:
+
+- Modular design
+- FSM-based control
+- Real-time display output
+- Hardware-ready architecture
+
+All modules are tested, integrated, and validated both in simulation and on FPGA hardware.

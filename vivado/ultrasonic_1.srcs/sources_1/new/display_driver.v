@@ -21,7 +21,7 @@ module display_driver (
     wire refresh_ce;
 
     clk_en #(
-        .MAX(32)
+        .MAX(100_000)
     ) u_clk_en (
         .clk (clk),
         .rst (rst),

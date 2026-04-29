@@ -207,9 +207,9 @@ The design was synthesized and implemented in Vivado.
 
 Bitstream was successfully generated and uploaded.
 
-Due to time constraints, full hardware testing with connected components was not completed.
+At the beginning of the 4th week, full hardware testing with connected components is completed.
 
-![FPGA](images/pyhsical_implemented_circuit.jpeg)
+![FPGA](images/physical_implemented_circuit.jpeg)
 
 ---
 

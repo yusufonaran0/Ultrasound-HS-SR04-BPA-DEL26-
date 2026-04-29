@@ -71,6 +71,7 @@ The `distance_converter` module converts the raw echo count into centimeters. At
 
 ```text
 distance_cm = echo_count / 5800
+``` 
 The display_driver module drives the multiplexed 8-digit 7-segment display. It receives the stored distance value and displays the result using active-low segment and anode outputs.
 
 The buzzer_control module creates a proximity alert. Larger distances keep the buzzer off or slow, while shorter distances increase the warning rate. Very close distances result in continuous buzzer activation.

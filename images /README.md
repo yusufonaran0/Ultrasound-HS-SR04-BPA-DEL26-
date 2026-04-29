@@ -1,4 +1,4 @@
-# Simulation and Hardware Results
+# Simulation Results
 
 This folder contains the waveform screenshots, schematic diagrams, wiring diagram, and initial hardware implementation evidence for the **Ultrasound Distance Meter with HS-SR04 on Nexys A7-50T** project.
 

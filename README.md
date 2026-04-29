@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project was developed for the **Digital Electronics course (BPA-DEL / BPC-DE1), Spring 2025/26**, at **Brno University of Technology**.
+This project was developed for the **Digital Electronics course (BPA-DEL), Spring 2025/26**, at **Brno University of Technology**.
 
 The project implements a complete ultrasonic distance measurement system using the HS-SR04 sensor on a Xilinx Nexys A7-50T FPGA board. The system measures distance, displays the result on a 7-segment display, and provides proximity feedback using a buzzer.
 

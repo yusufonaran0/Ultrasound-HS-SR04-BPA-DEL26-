@@ -58,7 +58,7 @@ This figure [1] illustrates the propagation of ultrasonic waves from the sensor 
 
 <br> 
 
-### HC-SR04 Timing Diagram
+### HS-SR04 Timing Diagram
 
 <p align="center">
   <img src="images/ultrasonic_timing_principle.jpg" width="600"/>
@@ -348,7 +348,7 @@ PASS: hold mode active
 
 ## FPGA Implementation
 
-The complete design was successfully synthesized, implemented, and deployed on the Nexys A7-50T FPGA board using Vivado 2025.2. The demo video is avaliable here: ---VIDEO LINK WILL BE INSTERTED---
+The complete design was successfully synthesized, implemented, and deployed on the Nexys A7-50T FPGA board using Vivado 2025.2. The demo video is available here: ---VIDEO LINK WILL BE INSTERTED---
 
 <p align="center">
   <img src="images/physical_implemented_circuit.jpeg" width="500"/>

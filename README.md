@@ -1,240 +1,50 @@
 # Ultrasound Distance Meter with HS-SR04 on Nexys A7-50T
 
-This project was developed for the **Digital Electronics** course at **Brno University of Technology (2025/26)**.
+This project was developed as part of the **BPA-DEL (Digital Electronics)** course at Brno University of Technology in the 2025/2026 academic year by Yusuf Çetin ONARAN and  Niloofar Malekimoghaddam. The goal of the project is to design and implement a real-time distance measurement system using an ultrasonic sensor on an FPGA platform.
 
-The objective is to design and implement a **fully synchronous FPGA-based ultrasonic distance measurement system** using the **HS-SR04 ultrasonic sensor** on the **Nexys A7-50T FPGA board**, following a **modular and hierarchical Verilog design methodology**.
+The system utilizes the **HS-SR04 ultrasonic sensor** to measure the distance to an object based on the Time-of-Flight (ToF) principle. The measured distance is processed on the **Nexys A7-50T FPGA**, displayed on 7-segment displays, and used to control a buzzer for proximity indication. The design follows a modular and fully synchronous architecture implemented in Verilog.
 
----
+## Background: Time-of-Flight Principle
 
-## System Principle
+Time-of-Flight (ToF) is a distance measurement method based on calculating the travel time of a wave between a transmitter and a receiver. In ultrasonic sensing systems, high-frequency sound waves are emitted, reflected from an object, and received back by the sensor.
 
-The system operates based on the **time-of-flight (ToF)** principle.
+The HC-SR04 ultrasonic module operates using this principle. It emits an ultrasonic pulse at approximately 40 kHz and measures the time required for the echo signal to return.
 
-After receiving a trigger pulse, the ultrasonic sensor emits a sound wave. This wave reflects from an object and returns to the sensor, generating an echo signal whose width is proportional to the distance.
+The fundamental relationship used for distance calculation is:
 
-The distance is calculated as:
+\[
+distance = \frac{v \cdot t}{2}
+\]
 
-d = (v × t) / 2
+where:
 
-Where:
-- v ≈ 343 m/s (speed of sound)
-- t = echo duration
+- \( v \) is the speed of sound in air (approximately 343 m/s at 20°C),
+- \( t \) is the measured round-trip time of the ultrasonic wave.
 
-The FPGA measures `t` in clock cycles and converts it into centimeters.
+The division by 2 is required because the signal travels to the object and back.
 
----
+In this project, the FPGA measures the duration of the ECHO signal in clock cycles. Given a system clock frequency of 100 MHz:
 
-## System Architecture
+\[
+t = \frac{\text{echo\_count}}{100 \times 10^6}
+\]
 
-The design is fully synchronous and operates using a **single 100 MHz clock domain**.
+Combining these equations leads to a simplified implementation formula:
 
-The system consists of four subsystems:
+\[
+distance_{cm} \approx \frac{\text{echo\_count}}{5800}
+\]
 
-### Control Unit
-Implemented in `measurement_control` as a finite state machine (FSM).  
-Responsible for trigger sequencing, measurement control, and hold functionality.
+This approximation is used in the `distance_converter` module for efficient hardware implementation.
 
-### Measurement Unit
-- `hs_sr04_trigger`: Generates a 10 µs trigger pulse  
-- `sr04_echo_capture`: Measures echo pulse width using a counter  
+### Ultrasonic Measurement Principle
 
-### Data Processing Unit
-- `distance_converter`: Converts clock cycles into centimeters  
+![Ultrasonic Principle](images/ultrasonic_sensing_principle.png)
 
-### Output Unit
-- `display_driver`: Drives multiplexed 7-segment display  
-- `buzzer_control`: Generates distance-based acoustic feedback  
-- LEDs: Indicate system state  
+### HC-SR04 Timing Diagram
 
----
+![Ultrasonic Timing](images/ultrasonic_timing_principle.jpg)
 
-## Module Interconnection
+The timing diagram shows the required 10 µs trigger pulse and the corresponding echo pulse width, which directly encodes the measured distance.
 
-The system data flow is:
-
-measurement_control → hs_sr04_trigger → sr04_echo_capture → distance_converter → display_driver / buzzer_control
-
-Signal behavior:
-- `start_trigger` initiates measurement  
-- `echo_done` indicates completion  
-- `echo_count` carries measured time  
-- `distance_cm` stores computed distance  
-- `valid_meas` indicates valid output  
-- `hold` freezes the output  
-
----
-
-## Top-Level Module Interface
-
-### ultrasonic_top
-
-| Signal | Direction | Width | Description |
-|--------|----------|-------|------------|
-| clk | input | 1 | 100 MHz system clock |
-| btnu | input | 1 | Reset |
-| btnd | input | 1 | Hold button |
-| echo | input | 1 | Echo signal |
-| trig | output | 1 | Trigger |
-| buzzer | output | 1 | Buzzer |
-| seg | output | 7 | 7-segment cathodes |
-| an | output | 8 | 7-segment anodes |
-| dp | output | 1 | Decimal point |
-| led | output | 4 | Status LEDs |
-
----
-
-## Module Overview
-
-| Module | Description | Source |
-|--------|------------|--------|
-| bin2seg | 7-segment decoder | [bin2seg.v](vivado/ultrasonic_1.srcs/sources_1/new/bin2seg.v) |
-| clk_en | Clock enable generator | [clk_en.v](vivado/ultrasonic_1.srcs/sources_1/new/clk_en.v) |
-| counter | Synchronous counter | [counter.v](vivado/ultrasonic_1.srcs/sources_1/new/counter.v) |
-| debounce | Button debouncing | [debounce.v](vivado/ultrasonic_1.srcs/sources_1/new/debounce.v) |
-| hs_sr04_trigger | Trigger generator | [hs_sr04_trigger.v](vivado/ultrasonic_1.srcs/sources_1/new/hs_sr04_trigger.v) |
-| sr04_echo_capture | Echo measurement | [sr04_echo_capture.v](vivado/ultrasonic_1.srcs/sources_1/new/sr04_echo_capture.v) |
-| distance_converter | Distance calculation | [distance_converter.v](vivado/ultrasonic_1.srcs/sources_1/new/distance_converter.v) |
-| measurement_control | FSM controller | [measurement_control.v](vivado/ultrasonic_1.srcs/sources_1/new/measurement_control.v) |
-| display_driver | Display driver | [display_driver.v](vivado/ultrasonic_1.srcs/sources_1/new/display_driver.v) |
-| buzzer_control | Buzzer logic | [buzzer_control.v](vivado/ultrasonic_1.srcs/sources_1/new/buzzer_control.v) |
-| ultrasonic_top | Top-level integration | [ultrasonic_top.v](vivado/ultrasonic_1.srcs/sources_1/new/ultrasonic_top.v) |
-
----
-
-## Schematics
-
-### Top-Level Schematic
-![Top-Level](images/schematics_top_level_ver3.png)
-
-### Physical Wiring
-![Physical](images/physical_schematics.jpeg)
-
----
-
-## Simulation
-
-Since Vivado was not always available on the personal machine, an **online EDA simulator** was used during development.
-
-All the simuilation outputs generated by EDA are listed: [Images](images/README.md) 
-
-EDA simulation testbenches can be accessed below. Each module includes a direct link to its testbench code and corresponding waveform output:
-
-- Display Driver  
-  Testbench: [display_driver_tb.v](eda_simulation_tb_codes/display_driver_tb.v)  
-  Waveform: [display_driver_eda_waveforms.png](images/display_driver_eda_waveforms.png)
-
-- Distance Converter  
-  Testbench: [distance_converter_tb.v](eda_simulation_tb_codes/distance_converter_tb.v)  
-  Waveform: [distance_converter_eda_waveforms.png](images/distance_converter_eda_waveforms.png)
-
-- HS-SR04 Trigger  
-  Testbench: [hs_sr04_trigger_tb.v](eda_simulation_tb_codes/hs_sr04_trigger_tb.v)  
-  Waveform: [hs_sr04_trigger_eda_waveforms.png](images/hs_sr04_trigger_eda_waveforms.png)
-
-- Measurement Control (FSM)  
-  Testbench: [measurement_control_tb.v](eda_simulation_tb_codes/measurement_control_tb.v)  
-  Waveform: [measurement_control_eda_waveforms.png](images/measurement_control_eda_waveforms.png)
-
-- Echo Capture  
-  Testbench: [sr04_echo_capture_tb.v](eda_simulation_tb_codes/sr04_echo_capture_tb.v)  
-  Waveform: [sr04_echo_capture_eda_waveforms.png](images/sr04_echo_capture_eda_waveforms.png)
-
-- Buzzer Control  
-  Testbench: [buzzer_control_tb.v](eda_simulation_tb_codes/buzzer_control_tb.v)  
-  Waveform: [buzzer_control_eda_waveforms.png](images/buzzer_control_eda_waveforms.png)
-
-- Top-Level Integration  
-  Testbench: [ultrasonic_top_tb.v](eda_simulation_tb_codes/ultrasonic_top_tb.v)  
-  Waveform: [top_level_eda_waveforms.png](images/top_level_eda_waveforms.png)
-### Top-Level Simulation (Vivado)
-
-![Top-Level Simulation](images/top_level_vivado_waveforms.jpeg)
-
-Console output:
-
-echo_count  = 5801  
-raw_dist    = 1  
-stored_dist = 1  
-valid_meas  = 1  
-led         = 0101  
-
-PASS: ultrasonic_top measured 1 cm correctly  
-PASS: hold mode active  
-
----
-
-## Hardware Considerations
-
-The ultrasonic sensor operates at 5V, while FPGA operates at 3.3V.
-
-A level shifting interface is required for the echo signal.
-
----
-
-## LED Indicators
-
-| LED | Function |
-|-----|---------|
-| LED0 | Measurement active |
-| LED1 | Hold mode active |
-| LED2 | Valid measurement |
-| LED3 | Timeout detected |
-
----
-
-## Project Progress
-
-### Week 1
-- Architecture defined  
-- Initial schematic created  
-- Repository initialized  
-
-### Week 2
-- All modules implemented  
-- Modular design completed  
-
-### Week 3
-- Simulations completed  
-- Top-level verified  
-- Bitstream generated  
-- FPGA programmed  
-
----
-
-## FPGA Implementation
-
-The design was synthesized and implemented in Vivado.
-
-Bitstream was successfully generated and uploaded.
-
-At the beginning of the 4th week, full hardware testing with connected components is completed.
-
-![FPGA](images/physical_implemented_circuit.jpeg)
-
----
-
-## Design Features
-
-- Fully synchronous design  
-- Single clock domain  
-- No inferred latches  
-- Modular architecture  
-- Clean datapath/control separation  
-
----
-
-## Testbenches
-
-EDA testbenches:  
-eda_simulation_tb_codes/
-
-Vivado testbenches:  
-vivado/ultrasonic_1.srcs/sim_1/new/
-
----
-
-## Conclusion
-
-The project demonstrates a complete FPGA-based ultrasonic distance measurement system.
-
-All modules were verified individually, and full system integration was validated through simulation.
+This method provides a simple, low-cost, and robust solution for real-time distance measurement in embedded systems.

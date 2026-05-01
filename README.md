@@ -213,8 +213,8 @@ The `ultrasonic_top` module represents the top-level entity of the system. It co
 
 All external signals are mapped to FPGA pins using the provided `.xdc` constraints file:
 
-`constrs_1/new/nexys.xdc`
+- [nexys.xdc](vivado/ultrasonic_1.srcs/constrs_1/new/nexys.xdc)
 
-The design follows a clean separation between external interface and internal logic, ensuring modularity and scalability.
+This ensures correct physical mapping between the FPGA and external peripherals on the Nexys A7-50T board. 
 
  

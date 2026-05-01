@@ -432,8 +432,50 @@ The estimated power consumption is low, which is expected for this project becau
 
 ## Conclusion
 
-In this project, a complete ultrasonic distance measurement system was successfully designed, implemented, and tested on the Nexys A7-50T FPGA using the HC-SR04 sensor. The system accurately measures distance based on the time-of-flight principle and presents the results in real time via 7-segment displays and a buzzer feedback mechanism.
+In this project, we designed and implemented an ultrasonic distance measurement system using the HC-SR04 sensor on the Nexys A7-50T FPGA. The system works based on the time-of-flight principle, where a trigger signal is sent, the echo duration is measured, and this timing is converted into distance and displayed on 7-segment displays. A buzzer was also added to give additional feedback based on distance.
 
-A modular and hierarchical design approach was followed, enabling clear separation of functionality and easier debugging, simulation, and integration. All modules were verified through simulation before hardware implementation, ensuring reliable system behavior on the FPGA.
+We followed a modular design approach, where each part of the system was implemented as a separate module. This made it much easier to develop, test, and debug the system step by step. First, we tested each module individually using simulations, and then we integrated everything into the top-level design. This helped us avoid major issues during hardware testing.
 
-The final implementation demonstrates efficient resource usage, low power consumption, and stable real-time operation. Overall, the project meets all specified requirements and provides a solid foundation for further extensions such as higher precision measurements, filtering techniques, or integration with additional peripherals. 
+During the project, we faced some practical challenges. One of the main difficulties was dealing with the echo signal coming from the sensor, since it is asynchronous. To handle this properly, we used synchronization techniques to avoid unstable behavior. Another challenge was making sure the system does not get stuck if no echo is received, which we solved by adding a timeout mechanism.
+
+We also noticed that taking measurements too frequently caused unstable results. To fix this, we added a delay between consecutive measurements, which improved the overall stability of the system. Adjusting this measurement interval was an important step in getting reliable hardware results.
+
+From a design perspective, we tried to keep everything in a single clock domain and used clock enable signals instead of generating new clocks. This made the design safer and easier to implement in Vivado.
+
+In the end, the system works reliably on the FPGA and produces consistent distance measurements. The resource usage is low, and the system runs efficiently in real time.
+
+Overall, this project helped us better understand how to design, simulate, and implement a complete digital system on FPGA. We also gained experience in debugging, timing considerations, and working with real hardware. In the future, the design could be improved by adding filtering or averaging for more precise measurements, or by extending the system with additional features such as communication interfaces. 
+
+
+## References and Tools
+
+### References
+
+- Ling, P. (2024, August 7). *Time-of-flight distance measurement enables emerging markets*. Avnet.  
+  Available at: https://www.avnet.com/americas/resources/article/time-of-flight-distance-measurement-enables-emerging-markets/ [1]
+
+- ElectronicWings. (n.d.). *HC-SR04 ultrasonic sensor guide with Arduino interfacing*.  
+  Available at: https://www.electronicwings.com/sensors-modules/ultrasonic-module-hc-sr04 [2]
+
+- Digilent Inc. (n.d.). *Nexys A7 FPGA Board Reference Manual*.  
+  Available at: https://digilent.com/reference/programmable-logic/nexys-a7/reference-manual
+
+- Fryza, T. (n.d.). *Verilog examples repository*.  
+  Available at: https://github.com/tomas-fryza/verilog-examples
+
+### Reused Modules
+
+The following modules were reused from the course materials provided by **Tomas Fryza**:
+
+- `bin2seg.v`
+- `counter.v`
+- `clk_en.v`
+
+These modules were adapted from the official course repository:
+https://github.com/tomas-fryza/verilog-examples
+
+### Tools
+
+- **Vivado 2025.2** – Used for simulation, synthesis, implementation, and FPGA programming  
+- **EDA Playground** – Used for testing and debugging individual modules  
+- **GitHub** – Used for version control and project management 

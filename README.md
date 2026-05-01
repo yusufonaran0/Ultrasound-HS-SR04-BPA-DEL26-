@@ -25,11 +25,7 @@ The system utilizes the **HS-SR04 ultrasonic sensor** to measure the distance to
 
 Time-of-Flight (ToF) is a distance measurement method based on calculating the travel time of a wave between a transmitter and a receiver. In ultrasonic sensing systems, high-frequency sound waves are emitted, reflected from an object, and received back by the sensor.
 
-The HC-SR04 ultrasonic module operates using this principle. It emits an ultrasonic pulse at approximately 40 kHz and measures the time required for the echo signal to return.
-
-The fundamental relationship used for distance calculation is:
-
-Distance formula:
+The HC-SR04 ultrasonic module operates using this principle. It emits an ultrasonic pulse at approximately 40 kHz and measures the time required for the echo signal to return The fundamental relationship used for distance calculation is:
 
     distance = (v × t) / 2
 
@@ -39,9 +35,9 @@ where:
 
 The division by 2 is required because the signal travels to the object and back.
 
-In this project, the FPGA measures the duration of the ECHO signal in clock cycles. Given a system clock frequency of 100 MHz:
+<br>
 
-The measured time is derived from the echo counter value:
+In this project, the FPGA measures the duration of the ECHO signal in clock cycles. Given a system clock frequency of 100 MHz. The measured time is derived from the echo counter value:
 
     t = echo_count / (100 × 10^6)
 
@@ -50,6 +46,8 @@ Based on this, the distance can be approximated in centimeters as:
     distance_cm ≈ echo_count / 5800
 
 This approximation is used in the `distance_converter` module for efficient hardware implementation.
+
+<br> 
 
 ### Ultrasonic Measurement Principle
 
@@ -74,16 +72,11 @@ This method provides a simple, low-cost, and robust solution for real-time dista
 
 ## Project Description
 
-The objective of this project is to design and implement a real-time distance measurement system using the **HS-SR04 ultrasonic sensor** and an FPGA platform.
-
-The system operates by generating a trigger pulse, capturing the duration of the returned echo signal, and converting this time measurement into distance using a hardware-efficient approximation. The computed distance is then displayed on the **7-segment display** of the Nexys A7-50T board.
+The objective of this project is to design and implement a real-time distance measurement system using the **HS-SR04 ultrasonic sensor** and an FPGA platform. The system operates by generating a trigger pulse, capturing the duration of the returned echo signal, and converting this time measurement into distance using a hardware-efficient approximation. The computed distance is then displayed on the **7-segment display** of the Nexys A7-50T board.
 
 In addition to distance visualization, the system includes a **buzzer control mechanism** that provides proximity-based feedback, where the buzzer frequency increases as the measured distance decreases. A **hold function** is also implemented using a debounced push-button input, allowing the user to freeze the last valid measurement on the display. 
 
-
-The design follows a **modular and hierarchical architecture**, where each functional block (trigger generation, echo capture, distance conversion, display control, and system control) is implemented as an independent Verilog module. The entire system is designed using a **single synchronous clock domain (100 MHz)**, avoiding the use of derived clocks and preventing unintended latch inference.
-
-All modules are verified through simulation before integration, and the complete system is synthesized and implemented on the FPGA, ensuring correct operation in both simulation and real hardware.
+The design follows a **modular and hierarchical architecture**, where each functional block (trigger generation, echo capture, distance conversion, display control, and system control) is implemented as an independent Verilog module. The entire system is designed using a **single synchronous clock domain (100 MHz)**, avoiding the use of derived clocks and preventing unintended latch inference. All modules are verified through simulation before integration, and the complete system is synthesized and implemented on the FPGA, ensuring correct operation in both simulation and real hardware.
 
 <br><br> 
 
@@ -104,6 +97,8 @@ The view of internal signal connections and synthesized logic, the Vivado-genera
 <p align="center">
   <img src="images/dataflow_schematics_vivado.jpeg" width="700"/>
 </p>
+
+<br>
 
 The overall dataflow of the system is as follows:
 
@@ -128,9 +123,9 @@ The overall dataflow of the system is as follows:
 
 ## Module Interconnection
 
-This section describes the signal-level connections between modules and how data propagates through the system during operation.
+This section describes the signal-level connections between modules and how data propagates through the system during operation. At the core of the design is a synchronous pipeline driven by the 100 MHz system clock. All modules operate within the same clock domain to ensure timing consistency and avoid metastability issues.
 
-At the core of the design is a synchronous pipeline driven by the 100 MHz system clock. All modules operate within the same clock domain to ensure timing consistency and avoid metastability issues.
+<br>
 
 ### Signal Flow Overview
 
@@ -171,6 +166,8 @@ The interconnection between modules follows a structured sequence:
      - `display_driver` → drives `seg[6:0]`, `an[7:0]`, `dp`
      - `buzzer_control` → generates `buzzer` output based on distance thresholds
 
+<br> 
+
 ### Design Characteristics
 
 - **Single Clock Domain:**  
@@ -193,6 +190,8 @@ This structured interconnection ensures reliable operation, clear signal propaga
 
 The `ultrasonic_top` module represents the top-level entity of the system. It connects the FPGA board inputs/outputs with all internal modules.
 
+<br> 
+
 ### Port Description
 
 | Signal Name | Direction | Width | Description |
@@ -207,6 +206,8 @@ The `ultrasonic_top` module represents the top-level entity of the system. It co
 | `dp`       | Output   | 1     | Decimal point (not used, kept inactive) |
 | `buzzer`   | Output   | 1     | Audio feedback output |
 | `led[3:0]` | Output   | 4     | Status/debug LEDs |
+
+<br> 
 
 ### Interface Description
 
@@ -230,18 +231,17 @@ The `ultrasonic_top` module represents the top-level entity of the system. It co
 - **LED Outputs (`led`)**  
   Used for debugging and indicating system states (e.g., measuring, valid data, hold mode).
 
-### Design Note
+  <br> 
 
-All external signals are mapped to FPGA pins using the provided `.xdc` constraints file:
+All external signals are mapped to FPGA pins using the provided `.xdc` constraints file: - [nexys.xdc](vivado/ultrasonic_1.srcs/constrs_1/new/nexys.xdc)
 
-- [nexys.xdc](vivado/ultrasonic_1.srcs/constrs_1/new/nexys.xdc)
-This ensures correct physical mapping between the FPGA and external peripherals on the Nexys A7-50T board.
 
 <br><br>
 
 ## Source Files
 
 The project is implemented using a modular Verilog structure. Each module has a specific responsibility and is connected through the `ultrasonic_top` top-level module.
+
 
 | Module | Origin / Status | Description | Source |
 |---|---|---|---|
@@ -257,9 +257,12 @@ The project is implemented using a modular Verilog structure. Each module has a 
 | `clk_en` | Reused course module | Generates a one-clock-cycle enable pulse every `MAX` cycles. Functionally identical to the course version. | [clk_en.v](vivado/ultrasonic_1.srcs/sources_1/new/clk_en.v) |
 | `counter` | Reused course module | Parameterized synchronous up counter with enable. Functionally identical to the course version. | [counter.v](vivado/ultrasonic_1.srcs/sources_1/new/counter.v) |
 
+<br> 
+
 ### Testbench Files
 
 The following testbenches were used to verify the custom and modified modules before or during integration.
+
 
 | Testbench | Verified Module | Source |
 |---|---|---|
@@ -270,6 +273,8 @@ The following testbenches were used to verify the custom and modified modules be
 | `distance_converter_tb` | Echo count to distance conversion | [distance_converter_tb.v](eda_simulation_tb_codes/distance_converter_tb.v) |
 | `display_driver_tb` | 7-segment display multiplexing and status output | [display_driver_tb.v](eda_simulation_tb_codes/display_driver_tb.v) |
 | `buzzer_control_tb` | Distance-based buzzer behavior | [buzzer_control_tb.v](eda_simulation_tb_codes/buzzer_control_tb.v) |
+
+<br> 
 
 ### Reused and Modified Course Modules
 
@@ -284,11 +289,11 @@ The `display_driver` module was written specifically for this project. Although 
  
 ## Simulation Results
 
-All custom modules were verified using individual testbenches before full system integration. Most module-level simulations were performed in EDA Playground, while the final top-level verification was also performed in Vivado Simulator.
-
-Detailed simulation explanations and all waveform screenshots are available here:
+All custom modules were verified using individual testbenches before full system integration. Most module-level simulations were performed in EDA Playground, while the final top-level verification was also performed in Vivado Simulator. Detailed simulation explanations and all waveform screenshots are available here:
 
 - [Detailed Simulation Results](images/Simulations.md)
+
+<br>
 
 ### Representative Simulation Results
 
@@ -302,6 +307,8 @@ Detailed simulation explanations and all waveform screenshots are available here
 
 This simulation verifies that the `hs_sr04_trigger` module generates the required trigger pulse after `start_meas` is asserted. The trigger signal remains active for the configured duration, and the `done` signal is generated after the pulse is completed.
 
+<br> 
+
 #### Echo Capture
 
 <p align="center">
@@ -311,6 +318,8 @@ This simulation verifies that the `hs_sr04_trigger` module generates the require
 </p>
 
 This simulation verifies that the `sr04_echo_capture` module detects the echo pulse, measures its high duration using `echo_count[31:0]`, and asserts `echo_done` when the pulse ends.
+
+<br>
 
 #### Top-Level Vivado Simulation
 
@@ -334,6 +343,7 @@ led         = 0101
 PASS: ultrasonic_top measured 1 cm correctly
 PASS: hold mode active
 ```
+
 <br><br>
 
 ## FPGA Implementation
@@ -346,11 +356,15 @@ The complete design was successfully synthesized, implemented, and deployed on t
   <em>Physical implementation of the ultrasonic distance measurement system</em>
 </p>
 
+<br> 
+
 <p align="center">
   <img src="images/physical_schematics.jpeg" width="500"/>
   <br>
   <em>Hardware wiring of the HS-SR04 sensor and FPGA connections</em>
 </p>
+
+<br> 
 
 ### Hardware Setup
 
@@ -361,6 +375,8 @@ The system consists of the following hardware components:
 - **Power Supply:** External 5V supply for the sensor
 - **Interface:** Pmod / direct pin connection with level compatibility
 
+<br> 
+
 ### Operation
 
 1. The FPGA generates a **10 µs trigger pulse** via the `trig` signal.
@@ -370,6 +386,8 @@ The system consists of the following hardware components:
 5. The result is displayed on the **7-segment display**.
 6. The **buzzer output** provides distance-based feedback.
 
+<br> 
+
 ### Measurement Behavior
 
 - Continuous measurement is performed with a fixed interval between readings.
@@ -377,6 +395,8 @@ The system consists of the following hardware components:
 - If no echo is received within the timeout window:
   - The system detects an invalid measurement
   - The display shows placeholder output (e.g., dashes)
+
+<br> 
 
 ### Measurement Interval Tuning
 
@@ -387,6 +407,8 @@ However, during hardware implementation, it was observed that performing measure
 Initially, a delay of **60 ms** was used, which provided acceptable results. For improved stability and more consistent measurements, the interval was later increased to **250 ms**.
 
 This adjustment significantly improved the reliability of the system in real hardware conditions, highlighting the difference between simulation assumptions and practical implementation constraints.
+
+<br>
 
 ### Implementation Notes
 
@@ -418,6 +440,8 @@ The design was synthesized and analyzed using **Vivado 2025.2** for the Nexys A7
 | BUFGCTRL | 1 | 32 | ~3.13% |
 
 The utilization report shows that the design uses only a small portion of the available FPGA resources. The most resource-consuming modules are `distance_converter`, `sr04_echo_capture`, and `display_driver`, mainly because of arithmetic operations, counters, and display multiplexing logic.
+
+<br> 
 
 ### Power Analysis
 
@@ -488,6 +512,8 @@ Overall, this project helped us better understand how to design, simulate, and i
 - Fryza, T. (n.d.). *Verilog examples repository*.  
   Available at: https://github.com/tomas-fryza/verilog-examples
 
+<br> 
+
 ### Reused Modules
 
 The following modules were reused from the course materials provided by **Tomas Fryza**:
@@ -498,6 +524,8 @@ The following modules were reused from the course materials provided by **Tomas 
 
 These modules were adapted from the official course repository:
 https://github.com/tomas-fryza/verilog-examples
+
+<br> 
 
 ### Tools
 

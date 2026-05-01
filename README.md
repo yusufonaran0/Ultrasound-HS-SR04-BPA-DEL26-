@@ -214,7 +214,98 @@ The `ultrasonic_top` module represents the top-level entity of the system. It co
 All external signals are mapped to FPGA pins using the provided `.xdc` constraints file:
 
 - [nexys.xdc](vivado/ultrasonic_1.srcs/constrs_1/new/nexys.xdc)
+This ensures correct physical mapping between the FPGA and external peripherals on the Nexys A7-50T board.
 
-This ensures correct physical mapping between the FPGA and external peripherals on the Nexys A7-50T board. 
+## Source Files
+
+The project is implemented using a modular Verilog structure. Each module has a specific responsibility and is connected through the `ultrasonic_top` top-level module.
+
+| Module | Origin / Status | Description | Source |
+|---|---|---|---|
+| `ultrasonic_top` | Custom top-level module | Integrates all modules and connects the design to Nexys A7 inputs/outputs. | [ultrasonic_top.v](vivado/ultrasonic_1.srcs/sources_1/new/ultrasonic_top.v) |
+| `measurement_control` | Custom project module | FSM controlling trigger generation, echo capture flow, hold mode, valid data, and measurement interval. | [measurement_control.v](vivado/ultrasonic_1.srcs/sources_1/new/measurement_control.v) |
+| `hs_sr04_trigger` | Custom project module | Generates the 10 µs trigger pulse required by the HS-SR04 sensor. | [hs_sr04_trigger.v](vivado/ultrasonic_1.srcs/sources_1/new/hs_sr04_trigger.v) |
+| `sr04_echo_capture` | Custom project module | Measures echo pulse width, detects echo edges, and handles timeout. | [sr04_echo_capture.v](vivado/ultrasonic_1.srcs/sources_1/new/sr04_echo_capture.v) |
+| `distance_converter` | Custom project module | Converts measured echo clock cycles into distance in centimeters. | [distance_converter.v](vivado/ultrasonic_1.srcs/sources_1/new/distance_converter.v) |
+| `display_driver` | Custom project module | Drives the 8-digit 7-segment display, shows distance in cm, supports hold indication, invalid-data dashes, blank digits, and the `C` unit character. | [display_driver.v](vivado/ultrasonic_1.srcs/sources_1/new/display_driver.v) |
+| `buzzer_control` | Custom project module | Generates distance-dependent acoustic feedback. | [buzzer_control.v](vivado/ultrasonic_1.srcs/sources_1/new/buzzer_control.v) |
+| `debounce` | Minor modified course module | Based on the course debouncer. Modified by increasing the sampling interval for hardware use and adding `next_shift` for updated shift-register evaluation. | [debounce.v](vivado/ultrasonic_1.srcs/sources_1/new/debounce.v) |
+| `bin2seg` | Reused course module | 4-bit hexadecimal to active-low 7-segment decoder. Functionally identical to the course version. | [bin2seg.v](vivado/ultrasonic_1.srcs/sources_1/new/bin2seg.v) |
+| `clk_en` | Reused course module | Generates a one-clock-cycle enable pulse every `MAX` cycles. Functionally identical to the course version. | [clk_en.v](vivado/ultrasonic_1.srcs/sources_1/new/clk_en.v) |
+| `counter` | Reused course module | Parameterized synchronous up counter with enable. Functionally identical to the course version. | [counter.v](vivado/ultrasonic_1.srcs/sources_1/new/counter.v) |
+
+### Testbench Files
+
+The following testbenches were used to verify the custom and modified modules before or during integration.
+
+| Testbench | Verified Module | Source |
+|---|---|---|
+| `ultrasonic_top_tb` | Full top-level integration | [ultrasonic_top_tb.v](eda_simulation_tb_codes/ultrasonic_top_tb.v) |
+| `measurement_control_tb` | Measurement FSM behavior | [measurement_control_tb.v](eda_simulation_tb_codes/measurement_control_tb.v) |
+| `hs_sr04_trigger_tb` | Trigger pulse generation | [hs_sr04_trigger_tb.v](eda_simulation_tb_codes/hs_sr04_trigger_tb.v) |
+| `sr04_echo_capture_tb` | Echo pulse measurement and timeout behavior | [sr04_echo_capture_tb.v](eda_simulation_tb_codes/sr04_echo_capture_tb.v) |
+| `distance_converter_tb` | Echo count to distance conversion | [distance_converter_tb.v](eda_simulation_tb_codes/distance_converter_tb.v) |
+| `display_driver_tb` | 7-segment display multiplexing and status output | [display_driver_tb.v](eda_simulation_tb_codes/display_driver_tb.v) |
+| `buzzer_control_tb` | Distance-based buzzer behavior | [buzzer_control_tb.v](eda_simulation_tb_codes/buzzer_control_tb.v) |
+
+### Reused and Modified Course Modules
+
+The modules `bin2seg`, `clk_en`, and `counter` were reused from the course/lab examples without functional modification.
+
+The `debounce` module is based on the course implementation but includes minor project-specific changes. The sampling interval was adjusted for hardware use, and the `next_shift` signal was added to evaluate the updated shift-register value more clearly.
+
+
+The `display_driver` module was written specifically for this project. Although it uses the same general multiplexing idea taught in the course, it was extended into a custom 8-digit distance display driver with support for hold indication, invalid measurement indication, blank digits, and centimeter display.
 
  
+## Simulation Results
+
+All custom modules were verified using individual testbenches before full system integration. Most module-level simulations were performed in EDA Playground, while the final top-level verification was also performed in Vivado Simulator.
+
+Detailed simulation explanations and all waveform screenshots are available here:
+
+- [Detailed Simulation Results](images/Simulations.md)
+
+### Representative Simulation Results
+
+#### HS-SR04 Trigger Generation
+
+<p align="center">
+  <img src="images/hs_sr04_trigger_eda_waveforms.png" width="750"/>
+  <br>
+  <em>HS-SR04 trigger simulation waveform</em>
+</p>
+
+This simulation verifies that the `hs_sr04_trigger` module generates the required trigger pulse after `start_meas` is asserted. The trigger signal remains active for the configured duration, and the `done` signal is generated after the pulse is completed.
+
+#### Echo Capture
+
+<p align="center">
+  <img src="images/sr04_echo_capture_eda_waveforms.png" width="750"/>
+  <br>
+  <em>Echo capture simulation waveform</em>
+</p>
+
+This simulation verifies that the `sr04_echo_capture` module detects the echo pulse, measures its high duration using `echo_count[31:0]`, and asserts `echo_done` when the pulse ends.
+
+#### Top-Level Vivado Simulation
+
+<p align="center">
+  <img src="images/top_level_vivado_waveforms.jpeg" width="750"/>
+  <br>
+  <em>Top-level Vivado simulation waveform</em>
+</p>
+
+The top-level Vivado simulation verifies the integrated behavior of the complete system, including trigger generation, echo capture, distance conversion, display activity, buzzer control, and LED status outputs.
+
+Console output from the top-level simulation:
+
+```text
+echo_count  = 5801
+raw_dist    = 1
+stored_dist = 1
+valid_meas  = 1
+led         = 0101
+
+PASS: ultrasonic_top measured 1 cm correctly
+PASS: hold mode active

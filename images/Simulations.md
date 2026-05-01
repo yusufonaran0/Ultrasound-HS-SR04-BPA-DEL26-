@@ -8,15 +8,13 @@ This section presents the simulation-based verification of the **Ultrasound Dist
 
 Each module was simulated independently to verify its functionality and to isolate potential issues early in the design process.
 
----
+<br> 
 
 ### `hs_sr04_trigger`
 
 ![HS-SR04 Trigger Simulation](./hs_sr04_trigger_eda_waveforms.png)
 
-This simulation verifies the generation of the trigger pulse required by the ultrasonic sensor.
-
-When `start_meas` is asserted, the module produces a HIGH pulse on `trig` for approximately **10 µs** (1000 clock cycles at 100 MHz).
+This simulation verifies the generation of the trigger pulse required by the ultrasonic sensor. When `start_meas` is asserted, the module produces a HIGH pulse on `trig` for approximately **10 µs** (1000 clock cycles at 100 MHz).
 
 The simulation confirms:
 - correct trigger pulse duration
@@ -135,7 +133,7 @@ The waveform confirms:
 
 <br>
 
-## Measurement Interval Adjustment Observation)
+## Measurement Interval Adjustment (Observations during implementation)
 
 During simulation, the delay between consecutive measurements was intentionally kept short to speed up waveform observation. However, during hardware implementation:
 - first adjusted to **60 ms**

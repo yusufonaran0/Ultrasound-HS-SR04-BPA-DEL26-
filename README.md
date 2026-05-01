@@ -417,3 +417,23 @@ The utilization report shows that the design uses only a small portion of the av
 
 The estimated power consumption is low, which is expected for this project because the design mainly consists of counters, FSM logic, simple arithmetic, and display/buzzer control.
 
+
+
+## Project Progress
+
+**Week 1:** The overall project requirements were analyzed and the system architecture was defined. The block diagram and dataflow structure were created, and the Git repository was initialized.
+
+**Week 2:** All core modules were implemented in Verilog and the top-level module (`ultrasonic_top`) was developed. Module interfaces and signal interconnections were finalized.
+
+**Week 3:** Simulations of individual modules and the top-level design were performed and verified. Waveform analysis confirmed correct functionality, and the bitstream was successfully generated in Vivado.
+
+**Week 4:** The physical circuit was assembled using the Nexys A7-50T and HC-SR04 sensor. The bitstream was programmed, real measurements were tested, the measurement interval was tuned for stability, and the final demo video was recorded. 
+
+
+## Conclusion
+
+In this project, a complete ultrasonic distance measurement system was successfully designed, implemented, and tested on the Nexys A7-50T FPGA using the HC-SR04 sensor. The system accurately measures distance based on the time-of-flight principle and presents the results in real time via 7-segment displays and a buzzer feedback mechanism.
+
+A modular and hierarchical design approach was followed, enabling clear separation of functionality and easier debugging, simulation, and integration. All modules were verified through simulation before hardware implementation, ensuring reliable system behavior on the FPGA.
+
+The final implementation demonstrates efficient resource usage, low power consumption, and stable real-time operation. Overall, the project meets all specified requirements and provides a solid foundation for further extensions such as higher precision measurements, filtering techniques, or integration with additional peripherals. 

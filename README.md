@@ -4,7 +4,22 @@ This project was developed as part of the **BPA-DEL (Digital Electronics)** cour
 
 The system utilizes the **HS-SR04 ultrasonic sensor** to measure the distance to an object based on the Time-of-Flight (ToF) principle. The measured distance is processed on the **Nexys A7-50T FPGA**, displayed on 7-segment displays, and used to control a buzzer for proximity indication. The design follows a modular and fully synchronous architecture implemented in Verilog.
 
+## Contents
 
+- [Background: Time-of-Flight Principle](#background-time-of-flight-principle)
+- [Project Description](#project-description)
+- [System Architecture and Dataflow](#system-architecture-and-dataflow)
+- [Module Interconnection](#module-interconnection)
+- [Top-Level Interface](#top-level-interface)
+- [Source Files](#source-files)
+- [Simulation Results](#simulation-results)
+- [FPGA Implementation - Physical Circuit - Demo Video](#fpga-implementation)
+- [Vivado Reports and Resource Usage](#vivado-reports-and-resource-usage)
+- [Weekly Project Progress](#project-progress)
+- [Conclusion](#conclusion)
+- [References and Tools](#references-and-tools) 
+
+<br><br>
 
 ## Background: Time-of-Flight Principle
 
@@ -43,6 +58,7 @@ This approximation is used in the `distance_converter` module for efficient hard
 </p>
 This figure [1] illustrates the propagation of ultrasonic waves from the sensor to an object and back. The distance is calculated based on the time difference between the transmitted and received signals.
 
+<br> 
 
 ### HC-SR04 Timing Diagram
 
@@ -54,6 +70,7 @@ The timing diagram [2] shows the required 10 µs trigger pulse and the correspon
 
 This method provides a simple, low-cost, and robust solution for real-time distance measurement in embedded systems. 
 
+<br><br>
 
 ## Project Description
 
@@ -64,10 +81,11 @@ The system operates by generating a trigger pulse, capturing the duration of the
 In addition to distance visualization, the system includes a **buzzer control mechanism** that provides proximity-based feedback, where the buzzer frequency increases as the measured distance decreases. A **hold function** is also implemented using a debounced push-button input, allowing the user to freeze the last valid measurement on the display. 
 
 
-
 The design follows a **modular and hierarchical architecture**, where each functional block (trigger generation, echo capture, distance conversion, display control, and system control) is implemented as an independent Verilog module. The entire system is designed using a **single synchronous clock domain (100 MHz)**, avoiding the use of derived clocks and preventing unintended latch inference.
 
 All modules are verified through simulation before integration, and the complete system is synthesized and implemented on the FPGA, ensuring correct operation in both simulation and real hardware.
+
+<br><br> 
 
 ## System Architecture and Dataflow
 
@@ -79,6 +97,7 @@ The system is designed using a modular and hierarchical architecture. The follow
 
 This diagram presents a simplified view of the system, focusing on the main functional blocks and their interactions.
 
+<br> 
 
 The view of internal signal connections and synthesized logic, the Vivado-generated dataflow schematic is shown below.
 
@@ -105,6 +124,7 @@ The overall dataflow of the system is as follows:
    - `buzzer_control` → audio feedback  
    - `debounce` → stable button input
 
+<br><br>
 
 ## Module Interconnection
 
@@ -167,6 +187,7 @@ The interconnection between modules follows a structured sequence:
 
 This structured interconnection ensures reliable operation, clear signal propagation, and maintainable system design.
 
+<br><br> 
 
 ## Top-Level Interface
 
@@ -216,6 +237,8 @@ All external signals are mapped to FPGA pins using the provided `.xdc` constrain
 - [nexys.xdc](vivado/ultrasonic_1.srcs/constrs_1/new/nexys.xdc)
 This ensures correct physical mapping between the FPGA and external peripherals on the Nexys A7-50T board.
 
+<br><br>
+
 ## Source Files
 
 The project is implemented using a modular Verilog structure. Each module has a specific responsibility and is connected through the `ultrasonic_top` top-level module.
@@ -257,6 +280,7 @@ The `debounce` module is based on the course implementation but includes minor p
 
 The `display_driver` module was written specifically for this project. Although it uses the same general multiplexing idea taught in the course, it was extended into a custom 8-digit distance display driver with support for hold indication, invalid measurement indication, blank digits, and centimeter display.
 
+<br><br>
  
 ## Simulation Results
 
@@ -310,6 +334,7 @@ led         = 0101
 PASS: ultrasonic_top measured 1 cm correctly
 PASS: hold mode active
 ```
+<br><br>
 
 ## FPGA Implementation
 
@@ -355,18 +380,13 @@ The system consists of the following hardware components:
 
 ### Measurement Interval Tuning
 
-To ensure stable operation and avoid interference between consecutive measurements, a delay is inserted between measurement cycles.
+During simulation, a shorter delay between consecutive measurements was used in order to speed up waveform observation and verification. This allowed faster debugging and easier validation of the system behavior.
 
-- System clock: **100 MHz**
-- Measurement interval: approximately **60 ms**
+However, during hardware implementation, it was observed that performing measurements too frequently caused unstable or incorrect readings from the HC-SR04 sensor. To address this, the measurement interval was increased.
 
-This corresponds to:
+Initially, a delay of **60 ms** was used, which provided acceptable results. For improved stability and more consistent measurements, the interval was later increased to **250 ms**.
 
-- `6,000,000` clock cycles between measurements
-
-This delay ensures that:
-- Echo reflections from previous measurements do not interfere
-- The sensor operates within its recommended timing constraints
+This adjustment significantly improved the reliability of the system in real hardware conditions, highlighting the difference between simulation assumptions and practical implementation constraints.
 
 ### Implementation Notes
 
@@ -375,6 +395,8 @@ This delay ensures that:
 - The system was verified both in simulation and on real hardware.
 
 The successful hardware implementation confirms the correctness and robustness of the overall system design.
+
+<br><br>
 
 ## Vivado Reports and Resource Usage
 
@@ -418,6 +440,7 @@ The utilization report shows that the design uses only a small portion of the av
 The estimated power consumption is low, which is expected for this project because the design mainly consists of counters, FSM logic, simple arithmetic, and display/buzzer control.
 
 
+<br><br> 
 
 ## Project Progress
 
@@ -429,6 +452,7 @@ The estimated power consumption is low, which is expected for this project becau
 
 **Week 4:** The physical circuit was assembled using the Nexys A7-50T and HC-SR04 sensor. The bitstream was programmed, real measurements were tested, the measurement interval was tuned for stability, and the final demo video was recorded. 
 
+<br><br>
 
 ## Conclusion
 
@@ -446,6 +470,7 @@ In the end, the system works reliably on the FPGA and produces consistent distan
 
 Overall, this project helped us better understand how to design, simulate, and implement a complete digital system on FPGA. We also gained experience in debugging, timing considerations, and working with real hardware. In the future, the design could be improved by adding filtering or averaging for more precise measurements, or by extending the system with additional features such as communication interfaces. 
 
+<br><br>
 
 ## References and Tools
 

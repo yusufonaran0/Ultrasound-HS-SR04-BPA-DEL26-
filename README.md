@@ -4,6 +4,7 @@ This project was developed as part of the **BPA-DEL (Digital Electronics)** cour
 
 The system utilizes the **HS-SR04 ultrasonic sensor** to measure the distance to an object based on the Time-of-Flight (ToF) principle. The measured distance is processed on the **Nexys A7-50T FPGA**, displayed on 7-segment displays, and used to control a buzzer for proximity indication. The design follows a modular and fully synchronous architecture implemented in Verilog.
 
+
 ## Background: Time-of-Flight Principle
 
 Time-of-Flight (ToF) is a distance measurement method based on calculating the travel time of a wave between a transmitter and a receiver. In ultrasonic sensing systems, high-frequency sound waves are emitted, reflected from an object, and received back by the sensor.
@@ -12,14 +13,13 @@ The HC-SR04 ultrasonic module operates using this principle. It emits an ultraso
 
 The fundamental relationship used for distance calculation is:
 
-\[
-distance = \frac{v \cdot t}{2}
-\]
+Distance formula:
+
+    distance = (v × t) / 2
 
 where:
-
-- \( v \) is the speed of sound in air (approximately 343 m/s at 20°C),
-- \( t \) is the measured round-trip time of the ultrasonic wave.
+- v = speed of sound
+- t = echo round-trip time
 
 The division by 2 is required because the signal travels to the object and back.
 
@@ -39,11 +39,15 @@ This approximation is used in the `distance_converter` module for efficient hard
 
 ### Ultrasonic Measurement Principle
 
-![Ultrasonic Principle](images/ultrasonic_sensing_principle.png)
+<p align="center">
+  <img src="images/ultrasonic_sensing_principle.png" width="600"/>
+</p>
 
 ### HC-SR04 Timing Diagram
 
-![Ultrasonic Timing](images/ultrasonic_timing_principle.jpg)
+<p align="center">
+  <img src="images/ultrasonic_timing principle.jpg" width="600"/>
+</p>
 
 The timing diagram shows the required 10 µs trigger pulse and the corresponding echo pulse width, which directly encodes the measured distance.
 

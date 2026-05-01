@@ -309,3 +309,111 @@ led         = 0101
 
 PASS: ultrasonic_top measured 1 cm correctly
 PASS: hold mode active
+```
+
+## FPGA Implementation
+
+The complete design was successfully synthesized, implemented, and deployed on the Nexys A7-50T FPGA board using Vivado 2025.2. The demo video is avaliable here: ---VIDEO LINK WILL BE INSTERTED---
+
+<p align="center">
+  <img src="images/physical_implemented_circuit.jpeg" width="500"/>
+  <br>
+  <em>Physical implementation of the ultrasonic distance measurement system</em>
+</p>
+
+<p align="center">
+  <img src="images/physical_schematics.jpeg" width="500"/>
+  <br>
+  <em>Hardware wiring of the HS-SR04 sensor and FPGA connections</em>
+</p>
+
+### Hardware Setup
+
+The system consists of the following hardware components:
+
+- **FPGA Board:** Nexys A7-50T (Artix-7, 100 MHz clock)
+- **Sensor:** HC-SR04 Ultrasonic Sensor
+- **Power Supply:** External 5V supply for the sensor
+- **Interface:** Pmod / direct pin connection with level compatibility
+
+### Operation
+
+1. The FPGA generates a **10 µs trigger pulse** via the `trig` signal.
+2. The HC-SR04 sensor emits ultrasonic waves and waits for reflection.
+3. The sensor outputs a high signal on the `echo` pin proportional to the distance.
+4. The FPGA measures the echo duration and converts it into distance.
+5. The result is displayed on the **7-segment display**.
+6. The **buzzer output** provides distance-based feedback.
+
+### Measurement Behavior
+
+- Continuous measurement is performed with a fixed interval between readings.
+- The **hold button (`btnd`)** freezes the current measured value.
+- If no echo is received within the timeout window:
+  - The system detects an invalid measurement
+  - The display shows placeholder output (e.g., dashes)
+
+### Measurement Interval Tuning
+
+To ensure stable operation and avoid interference between consecutive measurements, a delay is inserted between measurement cycles.
+
+- System clock: **100 MHz**
+- Measurement interval: approximately **60 ms**
+
+This corresponds to:
+
+- `6,000,000` clock cycles between measurements
+
+This delay ensures that:
+- Echo reflections from previous measurements do not interfere
+- The sensor operates within its recommended timing constraints
+
+### Implementation Notes
+
+- The design uses a **single clock domain**, avoiding clock domain crossing issues.
+- All timing-sensitive operations (trigger, echo measurement) are handled using counters.
+- The system was verified both in simulation and on real hardware.
+
+The successful hardware implementation confirms the correctness and robustness of the overall system design.
+
+## Vivado Reports and Resource Usage
+
+The design was synthesized and analyzed using **Vivado 2025.2** for the Nexys A7-50T target FPGA.
+
+### Resource Utilization
+
+<p align="center">
+  <img src="images/analysis_used_capacity.jpeg" width="750"/>
+  <br>
+  <em>Vivado resource utilization report</em>
+</p>
+
+| Resource | Used | Available | Utilization |
+|---|---:|---:|---:|
+| Slice LUTs | 771 | 32600 | ~2.37% |
+| Slice Registers / Flip-Flops | 210 | 65200 | ~0.32% |
+| Bonded IOB | 26 | 210 | ~12.38% |
+| BUFGCTRL | 1 | 32 | ~3.13% |
+
+The utilization report shows that the design uses only a small portion of the available FPGA resources. The most resource-consuming modules are `distance_converter`, `sr04_echo_capture`, and `display_driver`, mainly because of arithmetic operations, counters, and display multiplexing logic.
+
+### Power Analysis
+
+<p align="center">
+  <img src="images/analysis_power_consumption.jpeg" width="750"/>
+  <br>
+  <em>Vivado estimated power consumption report</em>
+</p>
+
+| Power Component | Estimated Power |
+|---|---:|
+| Total On-Chip Power | 0.074 W |
+| Dynamic Power | 0.012 W |
+| Device Static Power | 0.062 W |
+| Clock Power | 0.003 W |
+| Signal Power | 0.003 W |
+| Logic Power | 0.004 W |
+| I/O Power | 0.002 W |
+
+The estimated power consumption is low, which is expected for this project because the design mainly consists of counters, FSM logic, simple arithmetic, and display/buzzer control.
+

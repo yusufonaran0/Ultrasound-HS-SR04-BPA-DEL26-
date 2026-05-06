@@ -346,15 +346,14 @@ PASS: hold mode active
 
 <br><br>
 
-## FPGA Implementation
+## FPGA Implementation & Demo Video
 
-The complete design was successfully synthesized, implemented, and deployed on the Nexys A7-50T FPGA board using Vivado 2025.2. The demo video is available here: ---VIDEO LINK WILL BE INSTERTED---
+The complete design was successfully synthesized, implemented, and deployed on the Nexys A7-50T FPGA board using Vivado 2025.2. 
+The demo video is available here: 
+[Watch the Demo Video](https://drive.google.com/file/d/12pC6JsNwzupcctyzv8fWEuwIka2Fz19h/view?usp=sharing)
 
-## Demo Video
 
-The following video demonstrates the real-time hardware operation of the ultrasonic distance measurement system implemented on the Nexys A7-50T FPGA board.
 
-https://github.com/user-attachments/assets/2045a8db-1956-45ef-b068-26aa3fe7b9b0
 
 <p align="center">
   <img src="images/physical_implemented_circuit.jpeg" width="500"/>

@@ -352,9 +352,9 @@ The complete design was successfully synthesized, implemented, and deployed on t
 
 ## Demo Video
 
-<video width="800" controls>
-  <source src="images/video_realtime_ultrasound_demo.mp4">
-</video>
+The following video demonstrates the real-time hardware operation of the ultrasonic distance measurement system implemented on the Nexys A7-50T FPGA board.
+
+https://github.com/user-attachments/assets/2045a8db-1956-45ef-b068-26aa3fe7b9b0
 
 <p align="center">
   <img src="images/physical_implemented_circuit.jpeg" width="500"/>

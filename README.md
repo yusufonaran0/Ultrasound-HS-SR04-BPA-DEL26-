@@ -353,7 +353,7 @@ The complete design was successfully synthesized, implemented, and deployed on t
 ## Demo Video
 
 <video width="800" controls>
-  <source src="images/Video - Real-Time Ultrasound Distance Meter on Nexys A7-50T.mp4" type="video/mp4">
+  <source src="images/video_realtime_ultrasound_demo.mp4">
 </video>
 
 <p align="center">

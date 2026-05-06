@@ -350,6 +350,12 @@ PASS: hold mode active
 
 The complete design was successfully synthesized, implemented, and deployed on the Nexys A7-50T FPGA board using Vivado 2025.2. The demo video is available here: ---VIDEO LINK WILL BE INSTERTED---
 
+## Demo Video
+
+<video width="800" controls>
+  <source src="images/Video - Real-Time Ultrasound Distance Meter on Nexys A7-50T.mp4" type="video/mp4">
+</video>
+
 <p align="center">
   <img src="images/physical_implemented_circuit.jpeg" width="500"/>
   <br>

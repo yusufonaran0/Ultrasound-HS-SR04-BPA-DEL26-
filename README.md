@@ -352,8 +352,7 @@ The complete design was successfully synthesized, implemented, and deployed on t
 The demo video is available here: 
 [Watch the Demo Video](https://drive.google.com/file/d/12pC6JsNwzupcctyzv8fWEuwIka2Fz19h/view?usp=sharing)
 
-
-
+  <br> 
 
 <p align="center">
   <img src="images/physical_implemented_circuit.jpeg" width="500"/>

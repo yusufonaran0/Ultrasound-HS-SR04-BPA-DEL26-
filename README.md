@@ -13,7 +13,7 @@ The system utilizes the **HS-SR04 ultrasonic sensor** to measure the distance to
 - [Top-Level Interface](#top-level-interface)
 - [Source Files](#source-files)
 - [Simulation Results](#simulation-results)
-- [FPGA Implementation - Physical Circuit - Demo Video](#fpga-implementation-&-demo-video)
+- [FPGA Implementation - Physical Circuit - Demo Video](#fpga-implementation--demo-video)
 - [Vivado Reports and Resource Usage](#vivado-reports-and-resource-usage)
 - [Weekly Project Progress](#project-progress)
 - [Conclusion](#conclusion)
